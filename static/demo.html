@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form | Anwesha Sahoo</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+   <div class="wrapper">
+    <form id="login-form" onsubmit="handleLogin(event)">
+        <h1>Login</h1>
+        <div class="input-box">
+            <input type="text" id="username" placeholder="Username" required>
+        </div>
+        <div class="input-box">
+            <input type="password" id="password" placeholder="Password" required>
+        </div>
+        <div class="remember-forgot">
+            <label><input type="checkbox" id="rememberMe"> Remember Me</label>
+            <a href="#" id="forgot-password">Forgot password</a>
+        </div>
+        <button type="submit" class="btn">Login</button>
+        <div class="register-link">
+            <p>Don't have an account? <a href="#" id="register-link" onclick="showRegisterForm()">Register</a></p>
+        </div>
+    </form>
+
+    <!-- Hidden Registration Form -->
+    <form id="register-form" onsubmit="handleRegister(event)" style="display: none;">
+        <h1>Register</h1>
+        <div class="input-box">
+            <input type="text" id="register-username" placeholder="Username" required>
+        </div>
+        <div class="input-box">
+            <input type="email" id="register-email" placeholder="Email" required>
+        </div>
+        <div class="input-box">
+            <input type="password" id="register-password" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn">Register</button>
+        <div class="login-link">
+            <p>Already have an account? <a href="#" id="login-link" onclick="showLoginForm()">Login</a></p>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Show Registration Form
+    function showRegisterForm() {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('register-form').style.display = 'block';
+    }
+
+    // Show Login Form
+    function showLoginForm() {
+        document.getElementById('register-form').style.display = 'none';
+        document.getElementById('login-form').style.display = 'block';
+    }
+
+    // Handle Login
+    function handleLogin(event) {
+        event.preventDefault(); // Prevent the default form submission
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        // Create form data
+        const formData = new FormData();
+        formData.append("username", username);
+        formData.append("password", password);
+
+        // Send POST request to FastAPI backend for login
+        fetch('http://127.0.0.1:8000/login', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response Data:', data);
+            if (data.message === "Login Successful") {
+                alert("Login Successful");
+                window.location.href = "demo.html"; // Redirect after successful login
+            } else {
+                alert("Invalid username or password");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("An error occurred during login. Please try again later.");
+        });
+    }
+
+    // Handle Registration
+    function handleRegister(event) {
+        event.preventDefault(); // Prevent the default form submission
+        const username = document.getElementById('register-username').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+
+        // Create form data
+        const formData = new FormData();
+        formData.append("username", username);
+        formData.append("email", email);
+        formData.append("password", password);
+
+        // Send POST request to FastAPI backend for registration
+        fetch('http://127.0.0.1:8000/register', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response Data:', data);
+            if (data.message === "Registration Successful") {
+                alert("Registration Successful. Please login.");
+                showLoginForm(); // Show the login form after successful registration
+            } else {
+                alert("Registration failed. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("An error occurred during registration. Please try again later.");
+        });
+    }
+</script>
+<img src="/static/Images/background.jpg" alt="Background Image">
+</body>
+</html>
